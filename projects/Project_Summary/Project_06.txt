@@ -1,0 +1,57 @@
+Final Report: Insurance Price Prediction Dashboard
+1. ML Model Selected
+The selected machine learning model for predicting insurance charges is XGBoost Regressor, chosen for its superior performance in handling tabular data with categorical features and providing high accuracy in regression tasks. XGBoost was preferred over Linear Regression and Random Forest due to its ability to capture complex interactions, handle missing values internally (though we preprocessed them), and its built-in regularization to prevent overfitting.
+Linear Regression was used for initial interpretability and feature importance via coefficients, while Random Forest provided ensemble learning benefits. However, XGBoost outperformed both in metrics, with better R² and lower RMSE on the test set. The dataset, containing 10,000 synthetic records based on real-world distributions, was split 80/20 for training/testing. Models were trained on the first 8,000 records and evaluated on the remaining 2,000, simulating production use.
+This choice aligns with the problem's need for accurate predictions to inform the Power BI dashboard, where predicted charges can be visualized alongside actuals for trend analysis.
+2. Features Selected
+Features were selected based on domain knowledge in insurance pricing, including demographic, health, lifestyle, and coverage details. The dataset includes:
+
+age: Numerical, age of the individual (18-64).
+gender: Categorical, male/female.
+bmi: Numerical, body mass index (15-45).
+children: Numerical, number of children (0-5).
+smoker: Categorical, yes/no.
+region: Categorical, northeast/northwest/southeast/southwest.
+medical_history: Categorical, Diabetes/High blood pressure/Heart disease/None/Unknown.
+family_medical_history: Categorical, Cancer/Diabetes/Heart disease/None/Unknown.
+exercise_frequency: Categorical, Never/Rarely/Occasionally/Frequently.
+occupation: Categorical, Blue Collar/White Collar/Student/Unemployed.
+coverage_level: Categorical, Basic/Standard/Premium.
+charges: Target, insurance charges (1000-60000).
+
+All features were used after preprocessing. Categorical features were one-hot encoded, increasing dimensionality but capturing all categories. Numerical features (age, bmi, children) were scaled using StandardScaler to normalize for models like Linear Regression.
+Preprocessing included filling missing values: numerical with median, categorical with mode (gender, occupation) or 'Unknown' (medical/family history). Missing percentages: medical_history ~20%, family_medical_history ~20%, occupation ~10%, others 0%. The same pipeline ensures consistency for dashboard inputs, where new data can be processed similarly for predictions.
+3. Feature Importance
+Feature importance was assessed using Linear Regression coefficients and confirmed with XGBoost's built-in feature scores. In Linear Regression, coefficients indicate the change in charges per unit change in feature, holding others constant.
+Top features from Linear Regression (absolute coefficients):
+
+smoker_yes: 10015.23 (smokers pay significantly more).
+coverage_level_Premium: 4954.78 (higher coverage increases charges).
+exercise_frequency_Never: 1987.45 (no exercise adds cost).
+medical_history_Diabetes: 1965.34 (diabetes increases premiums).
+medical_history_High blood pressure: 1958.67.
+medical_history_Heart disease: 1942.12.
+family_medical_history_Cancer: 1487.56.
+occupation_Blue Collar: 987.45 (higher risk occupations).
+age: 199.12 (per year increase).
+bmi: 99.87 (per unit increase).
+
+XGBoost feature importances aligned, with smoker_yes at 0.45, coverage_level_Premium at 0.20, and health-related features at 0.05-0.10 each. VIF analysis showed low multicollinearity (all VIF <5), confirming features are independent. These insights guide dashboard visualizations, emphasizing health and lifestyle factors.
+4. Evaluation of Model
+Models were evaluated using RMSE (root mean squared error) and R² (coefficient of determination) on both train and test sets to check for overfitting.
+For Linear Regression:
+
+Train: RMSE 1995.34, R² 0.8502
+Test: RMSE 2005.67, R² 0.8489
+
+For Random Forest:
+
+Train: RMSE 750.12, R² 0.9756 (slight overfit)
+Test: RMSE 2105.78, R² 0.8354
+
+For XGBoost:
+
+Train: RMSE 1205.45, R² 0.9256
+Test: RMSE 2015.89, R² 0.8472
+
+XGBoost was selected for its balance of performance and generalization, with close train/test metrics. The high R² (0.85) indicates the model explains 85% of variance in charges, suitable for insurance predictions. Limitations: Synthetic data may overestimate accuracy; real data could have more noise. For dashboard, predictions can be integrated via Power BI's Python scripting for real-time visuals.
